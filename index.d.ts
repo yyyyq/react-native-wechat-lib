@@ -61,3 +61,19 @@ export function openMiniProgram(requestOption: {userName: string, path: string, 
  * @param url 客服url
 */
 // export function openCustomerSevice(requestOption: {corpid: string, url: string}) : Promise<any>;
+
+/**
+ * 分享文字到微信
+ * @param title 标题
+ * @param content 内容
+*/
+export function shareTextToWx(requestOption: {title: string, content: string}) : Promise<any>;
+
+
+/**
+ * 分享URL到微信
+ * @param title 标题
+ * @param description 介绍
+ * @param webUrl 网页链接
+*/
+export function shareUrlToWx(requestOption: {title: string, description: string,webUrl: string}) : Promise<any>;

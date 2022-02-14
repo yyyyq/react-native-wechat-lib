@@ -1,1 +1,9 @@
-<resources></resources>
+<resources>
+<string name="send_img">发送图片</string>
+	<string-array name="send_img_item">
+        <item>发送图片的二进制数据</item>
+        <item>发送图片的本地路径</item>
+        <!-- <item>发送图片的URL</item> -->
+    </string-array>
+	<string name="send_img_file_not_exist">文件不存在</string>
+</resources>

@@ -67,4 +67,18 @@ export default class Wechat {
   //  static openCustomerSevice(requestOption) {
   //   return NativeModules.RNWechat.openCustomerSevice(requestOption);
   // }
+
+ /**
+   * 分享文字到微信
+   */
+   static shareTextToWx(requestOption) {
+    return NativeModules.RNWechat._shareTextToWx(requestOption);
+  }
+  
+   /**
+   * 分享链接到微信
+   */
+    static shareUrlToWx(requestOption) {
+      return NativeModules.RNWechat._shareUrlToWx(requestOption);
+    }
 }

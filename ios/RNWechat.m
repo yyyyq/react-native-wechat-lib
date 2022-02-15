@@ -205,4 +205,27 @@ RCT_EXPORT_METHOD(openMiniProgram: (NSDictionary *)params resolver: (RCTPromiseR
 //   return [WXApi sendReq:req completion:nil];
 // }
 
+// 分享webUrl到微信
+RCT_EXPORT_METHOD(_shareUrlToWx: (NSDictionary *)params resolver: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  sendMiniProResolverStatic = resolve;
+  sendMiniProRejecterStatic = reject;
+    
+    NSLog(@"WeChatSDK ssdsds: %@", params[@"webUrl"]);
+
+  WXWebpageObject *webpageObject = [WXWebpageObject object];
+  webpageObject.webpageUrl = params[@"webUrl"];
+  WXMediaMessage *message = [WXMediaMessage message];
+  message.title = params[@"title"];	// 标题
+  message.description = params[@"description"]; // 介绍
+  [message setThumbImage:[UIImage imageNamed:@"RNWechat_send_img.png"]];
+  message.mediaObject = webpageObject;
+  SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+  req.bText = NO;
+  req.message = message;
+  req.scene = WXSceneSession;
+  return  [WXApi sendReq:req completion:^(BOOL success) {
+      NSLog(@"WeChatSDK shareUrlToWx: %d", success);
+  }];
+}
+
 @end

@@ -1,8 +1,23 @@
 package net.sourceforge.simcpux;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 
+import androidx.annotation.Nullable;
+
+import com.facebook.common.executors.UiThreadImmediateExecutorService;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.common.util.UriUtil;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -251,7 +266,7 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
   // 分享网页到微信
   public void _shareUrlToWx(ReadableMap requestParams, Promise promise) {
     RNWechatModule.sendReqPromise = promise;
-    String props[] = {"title", "description", "webUrl"};
+    String props[] = {"title", "description", "webUrl","thumbImage"};
     String title = requestParams.getString("title");
     String description = requestParams.getString("description");
     String webUrl = requestParams.getString("webUrl");
@@ -260,22 +275,89 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
     webpage.webpageUrl = webUrl;
 
     // 用 WXWebpageObject 对象初始化一个 WXMediaMessage 对象
-    WXMediaMessage msg = new WXMediaMessage(webpage);
+    final WXMediaMessage msg = new WXMediaMessage(webpage);
     msg.title = title;
     msg.description = description;
-    Bitmap thumbBmp = BitmapFactory.decodeResource(getReactApplicationContext().getResources(), R.drawable.send_img);
-    Bitmap bitmap = Bitmap.createScaledBitmap(thumbBmp,150,150,true);
-    thumbBmp.recycle();
-    msg.thumbData = Util.bmpToByteArray(bitmap, true);
+    String imageUrl = requestParams.getString("thumbImage");
+    Uri turi = Uri.parse(imageUrl);
+    if (turi.getScheme() == null) {
+      turi = getResourceDrawableUri(getReactApplicationContext(), imageUrl);
+    }
+    this._getImage(turi, new ResizeOptions(100, 100), new ImageCallback() {
+      @Override
+      public void invoke(@Nullable Bitmap bitmap) {
+        Bitmap thumbBmp = Bitmap.createScaledBitmap(bitmap,150,150,true);
+        bitmap.recycle();
+        msg.thumbData = Util.bmpToByteArray(thumbBmp, true);
 
-    // 构造一个Req
-    SendMessageToWX.Req req = new SendMessageToWX.Req();
-    req.transaction = String.valueOf(System.currentTimeMillis());
-    req.message = msg;
-    req.scene = SendMessageToWX.Req.WXSceneSession;
+        // 构造一个Req
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = String.valueOf(System.currentTimeMillis());
+        req.message = msg;
+        req.scene = SendMessageToWX.Req.WXSceneSession;
 
-    // 调用api接口，发送数据到微信
-    api.sendReq(req);
+        // 调用api接口，发送数据到微信
+        api.sendReq(req);
+      }
+    });
+
   }
 
+  // 获取图片
+  private static Uri getResourceDrawableUri(Context context, String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+    name = name.toLowerCase().replace("-", "_");
+    int resId = context.getResources().getIdentifier(
+            name,
+            "drawable",
+            context.getPackageName());
+
+    if (resId == 0) {
+      return null;
+    } else {
+      return new Uri.Builder()
+              .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
+              .path(String.valueOf(resId))
+              .build();
+    }
+  }
+
+  private void _getImage(Uri uri, ResizeOptions resizeOptions, final ImageCallback imageCallback) {
+    BaseBitmapDataSubscriber dataSubscriber = new BaseBitmapDataSubscriber() {
+      @Override
+      protected void onNewResultImpl(Bitmap bitmap) {
+        if (bitmap != null) {
+          if (bitmap.getConfig() != null) {
+            bitmap = bitmap.copy(bitmap.getConfig(), true);
+            imageCallback.invoke(bitmap);
+          } else {
+            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            imageCallback.invoke(bitmap);
+          }
+        } else {
+          imageCallback.invoke(null);
+        }
+      }
+
+      @Override
+      protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+        imageCallback.invoke(null);
+      }
+    };
+
+    ImageRequestBuilder builder = ImageRequestBuilder.newBuilderWithSource(uri);
+    if (resizeOptions != null) {
+      builder = builder.setResizeOptions(resizeOptions);
+    }
+    ImageRequest imageRequest = builder.build();
+
+    ImagePipeline imagePipeline = Fresco.getImagePipeline();
+    DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, null);
+    dataSource.subscribe(dataSubscriber, UiThreadImmediateExecutorService.getInstance());
+  }
+  private interface ImageCallback {
+    void invoke(@Nullable Bitmap bitmap);
+  }
 }

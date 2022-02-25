@@ -75,5 +75,6 @@ export function shareTextToWx(requestOption: {title: string, content: string}) :
  * @param title 标题
  * @param description 介绍
  * @param webUrl 网页链接
+ * @param thumbImage
 */
-export function shareUrlToWx(requestOption: {title: string, description: string,webUrl: string}) : Promise<any>;
+export function shareUrlToWx(requestOption: {title: string, description: string,webUrl: string,thumbImage:string}) : Promise<any>;

@@ -1,5 +1,5 @@
 <resources>
-<string name="send_img">发送图片</string>
+<string name="rnwechat_send_img">发送图片</string>
 	<string-array name="send_img_item">
         <item>发送图片的二进制数据</item>
         <item>发送图片的本地路径</item>

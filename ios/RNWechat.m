@@ -1,5 +1,6 @@
 #import "RNWechat.h"
-
+#import <React/RCTBridge.h>
+#import <React/RCTImageLoader.h>
 // Define error messages
 #define INVOKE_FAILED (@"WeChat API invoke returns false.")
 
@@ -18,10 +19,12 @@ static RCTPromiseResolveBlock sendMiniProResolverStatic = nil;
 
 static RCTPromiseRejectBlock sendMiniProRejecterStatic = nil;
 
-
 @implementation RNWechat {
     BOOL *_api;
 }
+
+@synthesize bridge = _bridge;
+
 
 + (RCTPromiseResolveBlock)getSendPayResolverStatic {
     return sendPayResolverStatic;
@@ -217,15 +220,26 @@ RCT_EXPORT_METHOD(_shareUrlToWx: (NSDictionary *)params resolver: (RCTPromiseRes
   WXMediaMessage *message = [WXMediaMessage message];
   message.title = params[@"title"];	// 标题
   message.description = params[@"description"]; // 介绍
-  [message setThumbImage:[UIImage imageNamed:@"RNWechat_send_img.png"]];
-  message.mediaObject = webpageObject;
-  SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
-  req.bText = NO;
-  req.message = message;
-  req.scene = WXSceneSession;
-  return  [WXApi sendReq:req completion:^(BOOL success) {
-      NSLog(@"WeChatSDK shareUrlToWx: %d", success);
-  }];
+  NSString *imageUrl  = params[@"thumbImage"];
+  NSURL *url = [NSURL URLWithString:imageUrl];
+      NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
+      [_bridge.imageLoader loadImageWithURLRequest:imageRequest size:CGSizeMake(100, 100) scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil partialLoadBlock:nil
+            completionBlock:^(NSError *error, UIImage *image) {
+          if(image){
+              [message setThumbImage: image];
+          }else{
+              [message setThumbImage: [UIImage imageNamed:@"rnwechat_send_img.png"]];
+          }
+          
+          message.mediaObject = webpageObject;
+          SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+          req.bText = NO;
+          req.message = message;
+          req.scene = WXSceneSession;
+          return  [WXApi sendReq:req completion:^(BOOL success) {
+              NSLog(@"WeChatSDK shareUrlToWx: %d", success);
+          }];
+      }];
 }
 
 @end

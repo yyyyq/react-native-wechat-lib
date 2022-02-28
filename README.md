@@ -532,10 +532,11 @@ const wechatInit = () => {
   Wechat.shareTextToWx({title, content});
               
   /**
+   * 分享webUrl链接
    * @param {string} title 标题
    * @param {string} description 介绍
    * @param {string} url URL链接
-   * @param {string} thumbImage 缩略图
+   * @param {string} thumbImage 缩略图---默认填rnwechat_send_img
    */
    let imgd = require('./assets/send_img.png');
    let thumbImage = Image.resolveAssetSource(imgd).uri;

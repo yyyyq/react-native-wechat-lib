@@ -1,8 +1,8 @@
-### react-native-wechat-libs
+### react-native-wechatlibs-dlxk
 
 
 
-安装: `yarn add react-native-wechat-libs`
+安装: `yarn add react-native-wechatlibs-dlxk`
 
 此项目改写自 [https://github.com/uiwjs/react-native-wechat](https://github.com/uiwjs/react-native-wechat)
 

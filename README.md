@@ -1,8 +1,8 @@
-### react-native-wechat-libs
+### react-native-wechatlibs-dlxk
 
 
 
-安装: `yarn add react-native-wechat-libs`
+安装: `yarn add react-native-wechatlibs-dlxk`
 
 此项目改写自 [https://github.com/uiwjs/react-native-wechat](https://github.com/uiwjs/react-native-wechat)
 
@@ -474,7 +474,7 @@ export function sendLoginRequest(requestOption: {state: string}) : Promise<any>;
 
 1. 注册、判断是否安装、支持微信示例
 ```js
-import Wechat from 'react-native-wechat-libs';
+import Wechat from 'react-native-wechatlibs-dlxk';
 const wechatInit = () => {
   await Wechat.registerApp(
         'wx7363cc9581927cb3',
@@ -506,7 +506,7 @@ const wechatInit = () => {
 ```
 2、 跳转小程序
 ```js
-  import Wechat from 'eather-react-native-wechat';
+  import Wechat from 'react-native-wechatlibs-dlxk';
   const goWXMiniProgram = () => {
     Wechat.openMiniProgram({
       // 小程序id
@@ -521,5 +521,30 @@ const wechatInit = () => {
       console.log('前往微信小程序', res);
     });
   }
+```
+3、分享文字或链接到微信
+```js
+  // 分享文字
+ /** @param {stirng} title 标题
+  * @param {string} content 内容
+  */            
+  import Wechat from 'react-native-wechatlibs-dlxk';
+  Wechat.shareTextToWx({title, content});
+              
+  /**
+   * 分享webUrl链接
+   * @param {string} title 标题
+   * @param {string} description 介绍
+   * @param {string} url URL链接
+   * @param {string} thumbImage 缩略图---默认填rnwechat_send_img
+   */
+   let imgd = require('./assets/send_img.png');
+   let thumbImage = Image.resolveAssetSource(imgd).uri;
+   Wechat.shareUrlToWx({
+    title,
+    description,
+    webUrl,
+    thumbImage: thumbImage || 'rnwechat_send_img',
+  });
 ```
 

@@ -153,7 +153,7 @@ RCT_REMAP_METHOD(sendPayRequest, params:(NSDictionary *)params resolver: (RCTPro
         } else if ([key isEqualToString:@"noncestr"]) {
             request.nonceStr = obj;
         } else if ([key isEqualToString:@"timestamp"]) {
-            request.timeStamp = (UInt32)obj;
+             request.timeStamp = [obj intValue];
         } else if ([key isEqualToString:@"sign"]) {
             request.sign = obj;
         }

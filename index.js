@@ -91,4 +91,11 @@ export default class Wechat {
   static shareUrlToWxTimeline(requestOption) {
     return NativeModules.RNWechat._shareUrlToWxTimeline(requestOption);
   }
+
+  /**
+   * 分享图片到微信
+   */
+   static shareImageToWx(requestOption) {
+    return NativeModules.RNWechat._shareImageToWx(requestOption);
+  }
 }

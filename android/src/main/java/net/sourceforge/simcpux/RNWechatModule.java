@@ -344,6 +344,38 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
 
   }
 
+  @ReactMethod
+  // 分享图片到微信
+  public void _shareImageToWx(ReadableMap requestParams, Promise promise) {
+    RNWechatModule.sendReqPromise = promise;
+
+    String props[] = {"sImage"};
+    String imageUrl = requestParams.getString("sImage");
+    Uri turi = Uri.parse(imageUrl);
+    if (turi.getScheme() == null) {
+      turi = getResourceDrawableUri(getReactApplicationContext(), imageUrl);
+    }
+
+    this._getImage(turi, null , new ImageCallback() {
+      @Override
+      public void invoke(@Nullable Bitmap bitmap) {
+        //初始化 WXImageObject 和 WXMediaMessage 对象
+        WXImageObject imgObj = new WXImageObject(bitmap);
+        WXMediaMessage msg = new WXMediaMessage();
+        msg.mediaObject = imgObj;
+
+        // 构造一个Req
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = String.valueOf(System.currentTimeMillis());
+        req.message = msg;
+        req.scene = SendMessageToWX.Req.WXSceneSession;
+
+        // 调用api接口，发送数据到微信
+        api.sendReq(req);
+      }
+    });
+  }
+
   // 获取图片
   private static Uri getResourceDrawableUri(Context context, String name) {
     if (name == null || name.isEmpty()) {

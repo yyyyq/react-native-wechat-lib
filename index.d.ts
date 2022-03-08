@@ -88,3 +88,9 @@ export function shareUrlToWx(requestOption: {title: string, description: string,
  * @param thumbImage
 */
 export function shareUrlToWxTimeline(requestOption: {title: string, description: string,webUrl: string,thumbImage:string}) : Promise<any>;
+
+/**
+ * 分享图片到微信
+ * @param sImage 图片
+*/
+export function shareImageToWx(requestOption:{sImage: string}) : Promise<any>;

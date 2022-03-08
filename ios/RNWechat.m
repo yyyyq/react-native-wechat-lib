@@ -276,4 +276,32 @@ RCT_EXPORT_METHOD(_shareUrlToWxTimeline: (NSDictionary *)params resolver: (RCTPr
       }];
 }
 
+// 分享图片到微信
+RCT_EXPORT_METHOD(_shareImageToWx: (NSDictionary *)params resolver: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    sendMiniProResolverStatic = resolve;
+    sendMiniProRejecterStatic = reject;
+
+    WXMediaMessage *message = [WXMediaMessage message];
+  NSString *imageUrl  = params[@"sImage"];
+  NSURL *url = [NSURL URLWithString:imageUrl];
+  NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
+  [self.bridge.imageLoader loadImageWithURLRequest:imageRequest callback:^(NSError *error, UIImage *image) {
+    if (image == nil){
+        NSLog(@"fail to load image resource");
+        return;
+    } else {
+       WXImageObject *imageObject = [WXImageObject object];
+       imageObject.imageData = UIImagePNGRepresentation(image);
+        message.mediaObject = imageObject;
+        SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+        req.bText = NO;
+        req.message = message;
+        req.scene = WXSceneSession;
+        return  [WXApi sendReq:req completion:^(BOOL success) {
+            NSLog(@"WeChatSDK shareUrlToWx: %d", success);
+        }];
+    }
+  }];
+}
+
 @end

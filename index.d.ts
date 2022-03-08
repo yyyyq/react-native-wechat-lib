@@ -78,3 +78,13 @@ export function shareTextToWx(requestOption: {title: string, content: string}) :
  * @param thumbImage
 */
 export function shareUrlToWx(requestOption: {title: string, description: string,webUrl: string,thumbImage:string}) : Promise<any>;
+
+
+/**
+ * 分享URL到微信朋友圈
+ * @param title 标题
+ * @param description 介绍
+ * @param webUrl 网页链接
+ * @param thumbImage
+*/
+export function shareUrlToWxTimeline(requestOption: {title: string, description: string,webUrl: string,thumbImage:string}) : Promise<any>;

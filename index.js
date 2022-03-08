@@ -1,4 +1,7 @@
-import { NativeModules, Platform } from 'react-native';
+import {
+  NativeModules,
+  Platform
+} from 'react-native';
 
 export default class Wechat {
   /**
@@ -50,14 +53,14 @@ export default class Wechat {
    * 发送登录认证请求
    * @param state 唯一标识码
    */
-   static sendLoginRequest(requestOption) {
+  static sendLoginRequest(requestOption) {
     return NativeModules.RNWechat.sendLoginRequest(requestOption);
   }
 
   /**
    * 跳转小程序
    */
-   static openMiniProgram(requestOption) {
+  static openMiniProgram(requestOption) {
     return NativeModules.RNWechat.openMiniProgram(requestOption);
   }
 
@@ -68,17 +71,24 @@ export default class Wechat {
   //   return NativeModules.RNWechat.openCustomerSevice(requestOption);
   // }
 
- /**
+  /**
    * 分享文字到微信
    */
-   static shareTextToWx(requestOption) {
+  static shareTextToWx(requestOption) {
     return NativeModules.RNWechat._shareTextToWx(requestOption);
   }
-  
-   /**
+
+  /**
    * 分享链接到微信
    */
-    static shareUrlToWx(requestOption) {
-      return NativeModules.RNWechat._shareUrlToWx(requestOption);
-    }
+  static shareUrlToWx(requestOption) {
+    return NativeModules.RNWechat._shareUrlToWx(requestOption);
+  }
+
+  /**
+   * 分享链接到微信朋友圈
+   */
+  static shareUrlToWxTimeline(requestOption) {
+    return NativeModules.RNWechat._shareUrlToWxTimeline(requestOption);
+  }
 }

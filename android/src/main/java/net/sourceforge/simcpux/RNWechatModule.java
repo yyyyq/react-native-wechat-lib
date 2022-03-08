@@ -303,6 +303,47 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
 
   }
 
+  @ReactMethod
+  // 分享网页到微信朋友圈
+  public void _shareUrlToWxTimeline(ReadableMap requestParams, Promise promise) {
+    RNWechatModule.sendReqPromise = promise;
+    String props[] = {"title", "description", "webUrl","thumbImage"};
+    String title = requestParams.getString("title");
+    String description = requestParams.getString("description");
+    String webUrl = requestParams.getString("webUrl");
+    // 初始化一个WXWebpageObject，填写url
+    WXWebpageObject webpage = new WXWebpageObject();
+    webpage.webpageUrl = webUrl;
+
+    // 用 WXWebpageObject 对象初始化一个 WXMediaMessage 对象
+    final WXMediaMessage msg = new WXMediaMessage(webpage);
+    msg.title = title;
+    msg.description = description;
+    String imageUrl = requestParams.getString("thumbImage");
+    Uri turi = Uri.parse(imageUrl);
+    if (turi.getScheme() == null) {
+      turi = getResourceDrawableUri(getReactApplicationContext(), imageUrl);
+    }
+    this._getImage(turi, new ResizeOptions(100, 100), new ImageCallback() {
+      @Override
+      public void invoke(@Nullable Bitmap bitmap) {
+        Bitmap thumbBmp = Bitmap.createScaledBitmap(bitmap,150,150,true);
+        bitmap.recycle();
+        msg.thumbData = Util.bmpToByteArray(thumbBmp, true);
+
+        // 构造一个Req
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = String.valueOf(System.currentTimeMillis());
+        req.message = msg;
+        req.scene = SendMessageToWX.Req.WXSceneTimeline;
+
+        // 调用api接口，发送数据到微信
+        api.sendReq(req);
+      }
+    });
+
+  }
+
   // 获取图片
   private static Uri getResourceDrawableUri(Context context, String name) {
     if (name == null || name.isEmpty()) {

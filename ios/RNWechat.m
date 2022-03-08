@@ -242,4 +242,38 @@ RCT_EXPORT_METHOD(_shareUrlToWx: (NSDictionary *)params resolver: (RCTPromiseRes
       }];
 }
 
+// 分享webUrl到微信朋友圈
+RCT_EXPORT_METHOD(_shareUrlToWxTimeline: (NSDictionary *)params resolver: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  sendMiniProResolverStatic = resolve;
+  sendMiniProRejecterStatic = reject;
+    
+    NSLog(@"WeChatSDK ssdsds: %@", params[@"webUrl"]);
+
+  WXWebpageObject *webpageObject = [WXWebpageObject object];
+  webpageObject.webpageUrl = params[@"webUrl"];
+  WXMediaMessage *message = [WXMediaMessage message];
+  message.title = params[@"title"];    // 标题
+  message.description = params[@"description"]; // 介绍
+  NSString *imageUrl  = params[@"thumbImage"];
+  NSURL *url = [NSURL URLWithString:imageUrl];
+      NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
+      [_bridge.imageLoader loadImageWithURLRequest:imageRequest size:CGSizeMake(100, 100) scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil partialLoadBlock:nil
+            completionBlock:^(NSError *error, UIImage *image) {
+          if(image){
+              [message setThumbImage: image];
+          }else{
+              [message setThumbImage: [UIImage imageNamed:@"rnwechat_send_img.png"]];
+          }
+          
+          message.mediaObject = webpageObject;
+          SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+          req.bText = NO;
+          req.message = message;
+          req.scene = WXSceneTimeline;
+          return  [WXApi sendReq:req completion:^(BOOL success) {
+              NSLog(@"WeChatSDK shareUrlToWx: %d", success);
+          }];
+      }];
+}
+
 @end

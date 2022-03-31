@@ -132,7 +132,7 @@ https://uiwjs.github.io/react-native-wechat/apple-app-site-association
            // 微信SDK
            // Android Studio环境下：已改用gradle形式，发布到jcenter，请开发者使用gradle来编译、更新微信SDK。
            // 在build.gradle文件中，添加如下依赖即可：
-           implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
+           implementation 'com.tencent.mm.opensdk:wechat-sdk-android:+'
            ......
        }
        ```
@@ -258,7 +258,7 @@ https://uiwjs.github.io/react-native-wechat/apple-app-site-association
         }
         ```
 
-    1. 在`AndroidManifest.xml`中加入对应的`activity`
+    3. 在`AndroidManifest.xml`中加入对应的`activity`
 
        1. 微信支付
 
@@ -269,7 +269,7 @@ https://uiwjs.github.io/react-native-wechat/apple-app-site-association
                       android:launchMode="singleTop"
                       android:theme="@android:style/Theme.NoDisplay" />
           ```
-      2. 微信登录认证/跳转小程序
+      1. 微信登录认证/跳转小程序
           
           ```xml
             <activity

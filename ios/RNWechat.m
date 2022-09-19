@@ -208,6 +208,25 @@ RCT_EXPORT_METHOD(openMiniProgram: (NSDictionary *)params resolver: (RCTPromiseR
 //   return [WXApi sendReq:req completion:nil];
 // }
 
+// 分享文字到微信
+RCT_EXPORT_METHOD(_shareTextToWx: (NSDictionary *)params resolver: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  sendMiniProResolverStatic = resolve;
+  sendMiniProRejecterStatic = reject;
+    
+    NSLog(@"WeChatSDK text: %@", params[@"title"]);
+  WXMediaMessage *message = [WXMediaMessage message];
+  message.title = params[@"title"];    // 标题
+  message.description = params[@"content"]; // 介绍
+  SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+  req.bText = YES;
+  req.text = params[@"title"];
+  req.message = message;
+  req.scene = WXSceneSession;
+  return  [WXApi sendReq:req completion:^(BOOL success) {
+    NSLog(@"WeChatSDK shareUrlToWx: %d", success);
+  }];
+}
+
 // 分享webUrl到微信
 RCT_EXPORT_METHOD(_shareUrlToWx: (NSDictionary *)params resolver: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   sendMiniProResolverStatic = resolve;
@@ -223,7 +242,7 @@ RCT_EXPORT_METHOD(_shareUrlToWx: (NSDictionary *)params resolver: (RCTPromiseRes
   NSString *imageUrl  = params[@"thumbImage"];
   NSURL *url = [NSURL URLWithString:imageUrl];
       NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
-      [_bridge.imageLoader loadImageWithURLRequest:imageRequest size:CGSizeMake(100, 100) scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil partialLoadBlock:nil
+      [[self.bridge moduleForName:@"ImageLoader"]  loadImageWithURLRequest:imageRequest size:CGSizeMake(100, 100) scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil partialLoadBlock:nil
             completionBlock:^(NSError *error, UIImage *image) {
           if(image){
               [message setThumbImage: image];
@@ -257,7 +276,7 @@ RCT_EXPORT_METHOD(_shareUrlToWxTimeline: (NSDictionary *)params resolver: (RCTPr
   NSString *imageUrl  = params[@"thumbImage"];
   NSURL *url = [NSURL URLWithString:imageUrl];
       NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
-      [_bridge.imageLoader loadImageWithURLRequest:imageRequest size:CGSizeMake(100, 100) scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil partialLoadBlock:nil
+      [[self.bridge moduleForName:@"ImageLoader"] loadImageWithURLRequest:imageRequest size:CGSizeMake(100, 100) scale:1 clipped:FALSE resizeMode:RCTResizeModeStretch progressBlock:nil partialLoadBlock:nil
             completionBlock:^(NSError *error, UIImage *image) {
           if(image){
               [message setThumbImage: image];
@@ -283,9 +302,9 @@ RCT_EXPORT_METHOD(_shareImageToWx: (NSDictionary *)params resolver: (RCTPromiseR
 
     WXMediaMessage *message = [WXMediaMessage message];
   NSString *imageUrl  = params[@"sImage"];
-  NSURL *url = [NSURL URLWithString:imageUrl];
+    NSURL *url = [NSURL URLWithString:imageUrl];
   NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
-  [self.bridge.imageLoader loadImageWithURLRequest:imageRequest callback:^(NSError *error, UIImage *image) {
+  [[self.bridge moduleForName:@"ImageLoader"] loadImageWithURLRequest:imageRequest callback:^(NSError *error, UIImage *image) {
     if (image == nil){
         NSLog(@"fail to load image resource");
         return;
